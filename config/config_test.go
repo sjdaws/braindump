@@ -11,6 +11,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestEnvBinding(t *testing.T) {
+	t.Parallel()
+
+	expected := &Config{Name: "Bob", Age: 32, Banana: false, Personality: Personality{Funny: true}}
+	os.Setenv("SPEC_FUNNY", "true")
+
+	v := viper.New()
+	f := flags()
+	env(v)
+
+	actual, _ := configure(v, f, nil)
+
+	assert.Equal(t, expected, actual)
+}
+
 func TestConfigure(t *testing.T) {
 	t.Parallel()
 
@@ -22,23 +37,23 @@ func TestConfigure(t *testing.T) {
 	} {
 		{
 			description: "Defaults",
-			expected: &Config{Name: "Bob", Age: 32, Banana: false},
+			expected: &Config{Name: "Bob", Age: 32, Banana: false, Personality: Personality{Funny: false}},
 		},
 		{
 			description: "Name and banana changed by env",
 			env: [][]string{{"name", "Tim"}, {"banana", "true"}},
-			expected: &Config{Name: "Tim", Age: 32, Banana: true},
+			expected: &Config{Name: "Tim", Age: 32, Banana: true, Personality: Personality{Funny: false}},
 		},
 		{
 			description: "Name and age changed by flags",
 			flags: []string{"-nJoe", "-a13"},
-			expected: &Config{Name: "Joe", Age: 13, Banana: false},
+			expected: &Config{Name: "Joe", Age: 13, Banana: false, Personality: Personality{Funny: false}},
 		},
 		{
 			description: "Flags beat env",
 			env: [][]string{{"name", "Tim"}, {"banana", "true"}},
 			flags: []string{"-nJoe", "-a13"},
-			expected: &Config{Name: "Joe", Age: 13, Banana: true},
+			expected: &Config{Name: "Joe", Age: 13, Banana: true, Personality: Personality{Funny: false}},
 		},
 	}
 

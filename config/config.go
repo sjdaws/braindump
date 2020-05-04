@@ -10,6 +10,11 @@ type Config struct {
 	Name string
 	Age int
 	Banana bool
+	Personality Personality
+}
+
+type Personality struct {
+	Funny bool
 }
 
 func flags() *flag.FlagSet {
@@ -20,6 +25,10 @@ func flags() *flag.FlagSet {
 	f.BoolP("banana", "b", false, "")
 
 	return f
+}
+
+func env(v *viper.Viper) {
+	v.BindEnv("personality.Funny", "SPEC_FUNNY")
 }
 
 // priority: viper -> env -> flags
